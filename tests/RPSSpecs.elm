@@ -10,9 +10,9 @@ import Fuzzers exposing (oneOfValues, moveFuzzer, twoDistinctMoves)
 tests : Test
 tests = describe "RPS Game Logic tests" 
     [ fuzz moveFuzzer "Same moves should draw" prop_sameMovesShoudDraw
-    , fuzz2 moveFuzzer moveFuzzer "Draw should be commutative" prop_drawCommutative
-    , fuzz twoDistinctMoves "Different moves lead to one players win" prop_onlyOneWinner
-    , fuzz winningCombinations "Winning sequences" spec_winningCombinations
+    , fuzz2 moveFuzzer moveFuzzer "Flipping moves should flip result" prop_gameIsSymetric
+    , fuzz winningCombinations "PlayerOneResult for PlayerOne winning combination" spec_playerOneWins
+    , fuzz winningCombinations "PlayerTwoResult for PlayerTwo winning combination" spec_playerTwoWins
     ]
 
 winningCombinations : Fuzzer (RPS.Move, RPS.Move)
@@ -20,27 +20,32 @@ winningCombinations = oneOfValues RPS.winningMoves
 
 prop_sameMovesShoudDraw : RPS.Move -> Expectation
 prop_sameMovesShoudDraw m = 
-    RPS.draws m m 
-    |> Expect.true "Expected draw"
+    RPS.playGame m m
+    |> Expect.equal RPS.Draw
 
-prop_drawCommutative : RPS.Move -> RPS.Move -> Expectation
-prop_drawCommutative x y =
+prop_gameIsSymetric : RPS.Move -> RPS.Move -> Expectation
+prop_gameIsSymetric x y =
     let
-        one = RPS.draws x y
-        two = RPS.draws y x
+        matchA = RPS.playGame x y
+        matchB = RPS.playGame y x
     in
-        Expect.equal one two
+        Expect.equal matchA <| flipResult matchB
 
-prop_onlyOneWinner : (RPS.Move, RPS.Move) -- Two different moves
-                  -> Expectation
-prop_onlyOneWinner (x, y) =
-    let
-        xWins = RPS.winsWith x y
-        yWins = RPS.winsWith y x
-    in
-       Expect.equal xWins (not yWins)
+flipResult : RPS.GameResult -> RPS.GameResult
+flipResult x = case x of
+    RPS.PlayerOneWon -> RPS.PlayerTwoWon
+    RPS.PlayerTwoWon -> RPS.PlayerOneWon
+    RPS.Draw -> RPS.Draw
 
-spec_winningCombinations : (RPS.Move, RPS.Move) -> Expectation
-spec_winningCombinations (win, lose) =
-    RPS.winsWith win lose
-    |> Expect.true "Expect winning combination" 
+spec_playerOneWins : (RPS.Move, RPS.Move) -> Expectation
+spec_playerOneWins (win, lose) =
+    RPS.playGame win lose
+    |> Expect.equal RPS.PlayerOneWon
+
+spec_playerTwoWins : (RPS.Move, RPS.Move) -> Expectation
+spec_playerTwoWins (win, lose) = 
+    RPS.playGame lose win 
+    |> Expect.equal RPS.PlayerTwoWon
+
+
+-- Kind'of redundant, not sure which API choose

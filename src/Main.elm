@@ -3,7 +3,7 @@ module Main exposing (..)
 import Html exposing (text, div, button, program, Html, node, i)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (attribute, class)
-import RPS exposing (Move(..), winsWith )
+import RPS exposing (Move(..), GameResult(..), playGame)
 import RPS.AI exposing (constAI, randomAI, winningAI)
 import Task
 import Random
@@ -11,10 +11,6 @@ import Random
 type Message = Restart
              | Play Move
              | GameFinished Move Move
-
-type GameResult = PlayerWon
-                | BotWon
-                | Draw
 
 type alias FinishedGame =
     { playerMove : Move
@@ -47,26 +43,14 @@ emptyModel = Model zeroScore []
 zeroScore : Score
 zeroScore = Score 0 0
 
-wins : Move -> Move -> Bool
-wins = RPS.winsWith
-
 makeBot : (Move -> Move) -> Move -> Message
 makeBot f m = GameFinished m (f m)
-
-decideWhoWon : Move -> Move -> GameResult
-decideWhoWon player ai =
-    if player == ai then
-        Draw
-    else if player |> wins ai then
-        BotWon
-    else 
-        PlayerWon
 
 scoreGame : Score -> GameResult -> Score
 scoreGame score result = 
     case result of
-        PlayerWon -> { score | playerScore = score.playerScore + 1 }
-        BotWon -> { score | botScore = score.botScore + 1 }
+        PlayerOneWon -> { score | playerScore = score.playerScore + 1 }
+        PlayerTwoWon -> { score | botScore = score.botScore + 1 }
         Draw -> score
 
 update : (Move -> Cmd Message)  -- Bot Function
@@ -79,7 +63,7 @@ update ai msg model =
         Play move -> ( model , ai move)
         GameFinished player ai ->
             let
-                result = decideWhoWon player ai 
+                result = playGame player ai 
             in
                ( { model 
                    | score = scoreGame model.score result

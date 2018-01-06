@@ -1,8 +1,9 @@
 module RPS exposing 
     ( Move(..)
-    , winsWith
+    , winningMoves
     , draws
-    , winningMoves) 
+    , GameResult(..)
+    , playGame ) 
 
 type Move = Rock
           | Paper
@@ -23,3 +24,16 @@ winsWith x y = case (x,y) of
 
 draws : Move -> Move -> Bool
 draws = (==)
+
+type GameResult = PlayerOneWon
+                | PlayerTwoWon
+                | Draw
+
+playGame : Move -> Move -> GameResult
+playGame one two = 
+    if draws one two then
+        Draw
+    else if winsWith one two then
+        PlayerOneWon
+    else 
+        PlayerTwoWon

@@ -6,9 +6,10 @@ import Fuzzers exposing (oneOfValues)
 import Test exposing (..)
 
 import Main exposing (..)
+import RPS exposing (GameResult(..))
 
 resultFuzzer : Fuzzer GameResult
-resultFuzzer = oneOfValues [PlayerWon, BotWon, Draw]
+resultFuzzer = oneOfValues [PlayerOneWon, PlayerTwoWon, Draw]
 
 scoreFuzzer : Fuzzer Score
 scoreFuzzer = Fuzz.map2 Score Fuzz.int Fuzz.int
@@ -23,7 +24,7 @@ prop_playerScoreShouldAddup : List GameResult -> Expectation
 prop_playerScoreShouldAddup games =
     let
         wonGames = 
-            List.filter ((==) PlayerWon) games
+            List.filter ((==) PlayerOneWon) games
             |> List.length
         score = List.foldr (flip scoreGame) zeroScore games
     in
@@ -33,7 +34,7 @@ prop_botScoreShouldAddup : List GameResult -> Expectation
 prop_botScoreShouldAddup games =
     let
         wonGames = 
-            List.filter ((==) BotWon) games
+            List.filter ((==) PlayerTwoWon) games
             |> List.length
         score = List.foldr (flip scoreGame) zeroScore games
     in
@@ -45,4 +46,3 @@ prop_drawShouldNotChangeScore score count =
    |> List.map (\_ -> Draw)
    |> List.foldr (flip scoreGame) score 
    |> Expect.equal score
-
