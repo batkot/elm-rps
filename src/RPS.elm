@@ -1,7 +1,6 @@
 module RPS exposing 
     ( Move(..)
     , winningMoves
-    , draws
     , GameResult(..)
     , playGame ) 
 

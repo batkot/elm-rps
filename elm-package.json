@@ -1,7 +1,7 @@
 {
     "version": "0.1.0",
     "summary": "Rock-Paper-Scissors - Elm exercise",
-    "repository": "https://github.com/batkot/elm-rps",
+    "repository": "https://github.com/batkot/elm-rps.git",
     "license": "WTFPL",
     "source-directories": [
         ".",

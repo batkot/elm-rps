@@ -46,6 +46,3 @@ spec_playerTwoWins : (RPS.Move, RPS.Move) -> Expectation
 spec_playerTwoWins (win, lose) = 
     RPS.playGame lose win 
     |> Expect.equal RPS.PlayerTwoWon
-
-
--- Kind'of redundant, not sure which API choose
