@@ -1,6 +1,6 @@
 module RPS.AI exposing 
     ( constAI
-    , cheatingAI
+    , winningAI
     , randomAI)
 
 import Random exposing (Generator)
@@ -20,8 +20,8 @@ lookUpAI lookup default move =
     |> List.head 
     |> Maybe.withDefault default
 
-cheatingAI : Move -> Move
-cheatingAI = lookUpAI winningMoves Scissors 
+winningAI : Move -> Move
+winningAI = lookUpAI winningMoves Scissors 
 
 randomAI : Generator Move
 randomAI = 

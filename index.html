@@ -9108,8 +9108,56 @@ var _user$project$RPS_AI$lookUpAI = F3(
 						},
 						lookup))));
 	});
-var _user$project$RPS_AI$cheatingAI = A2(_user$project$RPS_AI$lookUpAI, _user$project$RPS$winningMoves, _user$project$RPS$Scissors);
+var _user$project$RPS_AI$winningAI = A2(_user$project$RPS_AI$lookUpAI, _user$project$RPS$winningMoves, _user$project$RPS$Scissors);
 var _user$project$RPS_AI$constAI = _elm_lang$core$Basics$identity;
+var _user$project$Main$moveToFaGlyph = function (m) {
+	var _p0 = m;
+	switch (_p0.ctor) {
+		case 'Rock':
+			return 'fa fa-hand-rock-o';
+		case 'Paper':
+			return 'fa fa-hand-paper-o';
+		default:
+			return 'fa fa-hand-scissors-o';
+	}
+};
+var _user$project$Main$displayMove = function (m) {
+	return A2(
+		_elm_lang$html$Html$i,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class(
+				_user$project$Main$moveToFaGlyph(m)),
+			_1: {ctor: '[]'}
+		},
+		{ctor: '[]'});
+};
+var _user$project$Main$displayFinishedGame = function (game) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('finished-game'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Player: '),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Main$displayMove(game.playerMove),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Bot: '),
+					_1: {
+						ctor: '::',
+						_0: _user$project$Main$displayMove(game.botMove),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
 var _user$project$Main$stylesheet = function (link) {
 	var attrs = {
 		ctor: '::',
@@ -9131,46 +9179,46 @@ var _user$project$Main$stylesheet = function (link) {
 		attrs,
 		{ctor: '[]'});
 };
-var _user$project$Main$cmdLift = function (_p0) {
+var _user$project$Main$scoreGame = F2(
+	function (score, result) {
+		var _p1 = result;
+		switch (_p1.ctor) {
+			case 'PlayerWon':
+				return _elm_lang$core$Native_Utils.update(
+					score,
+					{playerScore: score.playerScore + 1});
+			case 'BotWon':
+				return _elm_lang$core$Native_Utils.update(
+					score,
+					{computerScore: score.computerScore + 1});
+			default:
+				return score;
+		}
+	});
+var _user$project$Main$wins = _user$project$RPS$winsWith;
+var _user$project$Main$cmdLift = function (_p2) {
 	return A2(
 		_elm_lang$core$Task$perform,
 		_elm_lang$core$Basics$identity,
-		_elm_lang$core$Task$succeed(_p0));
+		_elm_lang$core$Task$succeed(_p2));
 };
-var _user$project$Main$wins = _user$project$RPS$winsWith;
-var _user$project$Main$decideWhoWon = F3(
-	function (model, player, ai) {
-		return _elm_lang$core$Native_Utils.eq(player, ai) ? model : (A2(_user$project$Main$wins, ai, player) ? _elm_lang$core$Native_Utils.update(
-			model,
-			{playerScore: model.playerScore + 1}) : _elm_lang$core$Native_Utils.update(
-			model,
-			{computerScore: model.computerScore + 1}));
+var _user$project$Main$FinishedGame = F3(
+	function (a, b, c) {
+		return {playerMove: a, botMove: b, result: c};
 	});
 var _user$project$Main$Model = F2(
 	function (a, b) {
+		return {score: a, finishedGames: b};
+	});
+var _user$project$Main$Score = F2(
+	function (a, b) {
 		return {playerScore: a, computerScore: b};
 	});
-var _user$project$Main$zeroScore = A2(_user$project$Main$Model, 0, 0);
-var _user$project$Main$update = F3(
-	function (ai, msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'Restart':
-				return {ctor: '_Tuple2', _0: _user$project$Main$zeroScore, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'Play':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: ai(_p1._0)
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: A3(_user$project$Main$decideWhoWon, model, _p1._0, _p1._1),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
-	});
+var _user$project$Main$zeroScore = A2(_user$project$Main$Score, 0, 0);
+var _user$project$Main$emptyModel = A2(
+	_user$project$Main$Model,
+	_user$project$Main$zeroScore,
+	{ctor: '[]'});
 var _user$project$Main$GameFinished = F2(
 	function (a, b) {
 		return {ctor: 'GameFinished', _0: a, _1: b};
@@ -9188,18 +9236,18 @@ var _user$project$Main$makeBot = F2(
 			m,
 			f(m));
 	});
-var _user$project$Main$constBot = function (_p2) {
+var _user$project$Main$constBot = function (_p3) {
 	return _user$project$Main$cmdLift(
 		A2(
 			_user$project$Main$makeBot,
-			function (_p3) {
+			function (_p4) {
 				return _user$project$RPS_AI$constAI(_user$project$RPS$Rock);
 			},
-			_p2));
+			_p3));
 };
-var _user$project$Main$cheatingBot = function (_p4) {
+var _user$project$Main$cheatingBot = function (_p5) {
 	return _user$project$Main$cmdLift(
-		A2(_user$project$Main$makeBot, _user$project$RPS_AI$cheatingAI, _p4));
+		A2(_user$project$Main$makeBot, _user$project$RPS_AI$winningAI, _p5));
 };
 var _user$project$Main$Play = function (a) {
 	return {ctor: 'Play', _0: a};
@@ -9314,14 +9362,14 @@ var _user$project$Main$view = function (model) {
 											{
 												ctor: '::',
 												_0: _elm_lang$html$Html$text(
-													_elm_lang$core$Basics$toString(model.playerScore)),
+													_elm_lang$core$Basics$toString(model.score.playerScore)),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html$text(':'),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html$text(
-															_elm_lang$core$Basics$toString(model.computerScore)),
+															_elm_lang$core$Basics$toString(model.score.computerScore)),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -9344,7 +9392,18 @@ var _user$project$Main$view = function (model) {
 													_0: _elm_lang$html$Html$text('Restart'),
 													_1: {ctor: '[]'}
 												}),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('finished-games'),
+														_1: {ctor: '[]'}
+													},
+													A2(_elm_lang$core$List$map, _user$project$Main$displayFinishedGame, model.finishedGames)),
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}
@@ -9355,12 +9414,51 @@ var _user$project$Main$view = function (model) {
 			}
 		});
 };
+var _user$project$Main$Draw = {ctor: 'Draw'};
+var _user$project$Main$BotWon = {ctor: 'BotWon'};
+var _user$project$Main$PlayerWon = {ctor: 'PlayerWon'};
+var _user$project$Main$decideWhoWon = F2(
+	function (player, ai) {
+		return _elm_lang$core$Native_Utils.eq(player, ai) ? _user$project$Main$Draw : (A2(_user$project$Main$wins, ai, player) ? _user$project$Main$PlayerWon : _user$project$Main$BotWon);
+	});
+var _user$project$Main$update = F3(
+	function (ai, msg, model) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
+			case 'Restart':
+				return {ctor: '_Tuple2', _0: _user$project$Main$emptyModel, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Play':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: ai(_p6._0)
+				};
+			default:
+				var _p8 = _p6._0;
+				var _p7 = _p6._1;
+				var result = A2(_user$project$Main$decideWhoWon, _p8, _p7);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							score: A2(_user$project$Main$scoreGame, model.score, result),
+							finishedGames: {
+								ctor: '::',
+								_0: A3(_user$project$Main$FinishedGame, _p8, _p7, result),
+								_1: model.finishedGames
+							}
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$Main$zeroScore, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$Main$emptyModel, _1: _elm_lang$core$Platform_Cmd$none},
 		update: _user$project$Main$update(_user$project$Main$cheatingBot),
 		view: _user$project$Main$view,
-		subscriptions: function (_p5) {
+		subscriptions: function (_p9) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

@@ -7,7 +7,7 @@ import Expect exposing (Expectation)
 import Fuzzers exposing (moveFuzzer)
 
 import RPS
-import RPS.AI exposing (constAI, cheatingAI)
+import RPS.AI exposing (constAI, winningAI)
 
 tests : Test
 tests = describe "RPS AI Tests" 
@@ -25,7 +25,7 @@ prop_constAI given =
 prop_cheatingAIAlwaysWins : RPS.Move -> Expectation
 prop_cheatingAIAlwaysWins otherMove = 
     let
-        aiMove = cheatingAI otherMove
+        aiMove = winningAI otherMove
     in
         RPS.winsWith aiMove otherMove
         |> Expect.true "Cheating AI should win" 
