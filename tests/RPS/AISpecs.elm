@@ -11,17 +11,14 @@ import RPS.AI exposing (constAI, cheatingAI)
 
 tests : Test
 tests = describe "RPS AI Tests" 
-    [ fuzz2 moveFuzzer moveFuzzer "ConstAI should always return given move" prop_constAI
+    [ fuzz moveFuzzer "ConstAI should always return given move" prop_constAI
     , fuzz moveFuzzer "Cheating AI always returns winning move" prop_cheatingAIAlwaysWins
     ]
 
 -- Const AI
-prop_constAI : RPS.Move -> RPS.Move -> Expectation
-prop_constAI given other =
-    let 
-        ai = constAI given
-    in  
-        ai other
+prop_constAI : RPS.Move -> Expectation
+prop_constAI given =
+        constAI given
         |> Expect.equal given
 
 -- Cheating AI

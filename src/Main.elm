@@ -4,7 +4,7 @@ import Html exposing (text, div, button, program, Html, node, i)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (attribute, class)
 import RPS exposing (Move(..), winsWith )
-import RPS.AI exposing (constAI, randomAI)
+import RPS.AI exposing (constAI, randomAI, cheatingAI)
 import Task
 import Random
 
@@ -17,10 +17,13 @@ type alias Model =
     , computerScore : Int }
 
 constBot : (Move -> Cmd Message)
-constBot =  makeBot (constAI Rock) >> cmdLift
+constBot =  makeBot (\_ -> constAI Rock) >> cmdLift
 
 randomBot : (Move -> Cmd Message)
-randomBot m = Random.generate (GameFinished m) (randomAI m)
+randomBot m = Random.generate (GameFinished m) randomAI
+
+cheatingBot : (Move -> Cmd Message)
+cheatingBot = makeBot cheatingAI >> cmdLift
 
 zeroScore : Model
 zeroScore = Model 0 0
@@ -85,6 +88,6 @@ view model =
 main : Program Never Model Message
 main = program
         { init = (zeroScore, Cmd.none)
-        , update = update <| randomBot
+        , update = update <| cheatingBot
         , view = view
         , subscriptions = \_ -> Sub.none }

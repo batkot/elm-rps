@@ -7,8 +7,8 @@ import Random exposing (Generator)
 
 import RPS exposing (Move(..), winningMoves)
 
-constAI : Move -> Move -> Move
-constAI a _ = a
+constAI : Move -> Move
+constAI = identity
 
 fst : (a,b) -> a
 fst (a,b) = a
@@ -23,8 +23,8 @@ lookUpAI lookup default move =
 cheatingAI : Move -> Move
 cheatingAI = lookUpAI winningMoves Scissors 
 
-moveGen : Generator Move
-moveGen = 
+randomAI : Generator Move
+randomAI = 
     let
         makeMove x = case x of
             1 -> Rock
@@ -32,6 +32,3 @@ moveGen =
             _ -> Paper
     in
         Random.map makeMove <| Random.int 1 3
-
-randomAI : Move -> Generator Move
-randomAI _ = moveGen
