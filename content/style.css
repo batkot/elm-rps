@@ -1,0 +1,18 @@
+body {
+    background : #F0F0F0;
+    height: 100%;
+}
+
+.board {
+    display: block;
+    text-align: center;
+    height: 100%;
+    background : #E0E0E0;
+}
+
+.button {
+    background: #D0D0D0;
+    display: inline-block;
+    cursor: pointer;
+    overflow: hidden;
+}
