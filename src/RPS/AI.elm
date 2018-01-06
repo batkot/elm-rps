@@ -1,6 +1,9 @@
 module RPS.AI exposing 
     ( constAI
-    , cheatingAI)
+    , cheatingAI
+    , randomAI)
+
+import Random exposing (Generator)
 
 import RPS exposing (Move(..), winningMoves)
 
@@ -19,3 +22,16 @@ lookUpAI lookup default move =
 
 cheatingAI : Move -> Move
 cheatingAI = lookUpAI winningMoves Scissors 
+
+moveGen : Generator Move
+moveGen = 
+    let
+        makeMove x = case x of
+            1 -> Rock
+            2 -> Scissors
+            _ -> Paper
+    in
+        Random.map makeMove <| Random.int 1 3
+
+randomAI : Move -> Generator Move
+randomAI _ = moveGen

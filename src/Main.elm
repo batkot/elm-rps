@@ -4,20 +4,32 @@ import Html exposing (text, div, button, program, Html, node, i)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (attribute, class)
 import RPS exposing (Move(..), winsWith )
-import RPS.AI exposing (constAI)
+import RPS.AI exposing (constAI, randomAI)
+import Task
+import Random
 
 type Message = Restart
              | Play Move
+             | GameFinished Move Move
 
 type alias Model = 
     { playerScore : Int
     , computerScore : Int }
+
+constBot : (Move -> Cmd Message)
+constBot =  makeBot (constAI Rock) >> cmdLift
+
+randomBot : (Move -> Cmd Message)
+randomBot m = Random.generate (GameFinished m) (randomAI m)
 
 zeroScore : Model
 zeroScore = Model 0 0
 
 wins : Move -> Move -> Bool
 wins = RPS.winsWith
+
+makeBot : (Move -> Move) -> Move -> Message
+makeBot f m = GameFinished m (f m)
 
 decideWhoWon : Model -> Move -> Move -> Model
 decideWhoWon model player ai =
@@ -28,19 +40,19 @@ decideWhoWon model player ai =
     else 
         { model | computerScore = model.computerScore + 1 }
 
+cmdLift : a -> Cmd a
+cmdLift = Task.succeed >> Task.perform identity
 
-update : (Move -> Move)  -- AI Function
+update : (Move -> Cmd Message)  -- Bot Function
       -> Message            
       -> Model 
       -> (Model, Cmd Message)
 update ai msg model = 
     case msg of 
         Restart -> (zeroScore, Cmd.none)
-        Play move -> 
-            let 
-                aiMove = ai move
-            in
-               (decideWhoWon model move aiMove, Cmd.none)
+        Play move -> ( model , ai move)
+        GameFinished player ai ->
+               (decideWhoWon model player ai, Cmd.none)
 
 
 stylesheet : String -> Html msg
@@ -73,6 +85,6 @@ view model =
 main : Program Never Model Message
 main = program
         { init = (zeroScore, Cmd.none)
-        , update = update <| constAI Rock
+        , update = update <| randomBot
         , view = view
         , subscriptions = \_ -> Sub.none }
