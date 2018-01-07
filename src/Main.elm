@@ -137,6 +137,6 @@ displayMove m = i [class <| moveToFaGlyph m] []
 main : Program Never Model Message
 main = program
         { init = (emptyModel, Cmd.none)
-        , update = update <| cheatingBot
+        , update = update <| randomBot
         , view = view
         , subscriptions = \_ -> Sub.none }
