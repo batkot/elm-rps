@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (text, div, button, program, Html, node, i)
+import Html exposing (text, div, button, program, Html, node, i, h1)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (attribute, class)
 import RPS exposing (Move(..), GameResult(..), playGame)
@@ -82,20 +82,37 @@ stylesheet link =
     in 
        node tag attrs []
 
+gameButton : Move -> Html Message
+gameButton move = 
+    div [class "button", onClick <| Play move] [i [class <| (moveToFaGlyph move ++ " fa-4x")] []]
+
 view : Model -> Html Message
 view model = 
-    div []
+    div [class "container"]
     [ stylesheet "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    , stylesheet "https://www.w3schools.com/w3css/4/w3.css"
     , stylesheet "content/style.css"
-    , div [class "board"]
-        [ div [class "button", onClick <| Play Rock] [i [class "fa fa-hand-rock-o"] []]
-        , div [class "button", onClick <| Play Scissors] [i [class "fa fa-hand-scissors-o"] []] 
-        , div [class "button", onClick <| Play Paper] [i [class "fa fa-hand-paper-o"] []]
-        , div [class "score"] [ text <| toString model.score.playerScore, text ":" , text <| toString model.score.botScore]
-        , div [class "restart button", onClick Restart] [text "Restart"]
-        , div [class "finished-games"] <| List.map displayFinishedGame model.finishedGames
-        ] 
+    , div [class "w3-row board"]
+        [ renderPlayerBox "Player" model.score.playerScore
+        , renderBattleGround
+        , renderPlayerBox "Bot" model.score.botScore ] 
+    , div [class "w3-row w3-content"] 
+          [div [class "w3-col button", onClick Restart] [text "Restart"]]
     ]
+
+renderBattleGround : Html Message
+renderBattleGround = div [class "w3-third w3-row battleground"] 
+             [ div [class "w3-col move-choose"] 
+                    [ div [class "w3-row"] [gameButton Rock]
+                    , div [class "w3-row"] [gameButton Scissors]
+                    , div [class "w3-row"] [gameButton Paper]]
+             , div [class "w3-rest"] []]
+
+renderPlayerBox : String -> Int -> Html Message
+renderPlayerBox name score =
+    div [class "w3-third"]
+        [ div [class "w3-row"] [text name]
+        , div [class "w3-row"] [h1 [] [text <| toString score]]]
 
 displayFinishedGame : FinishedGame -> Html Message
 displayFinishedGame game = 
