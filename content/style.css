@@ -1,5 +1,5 @@
 body, html{
-    background : #F0F0F0;
+    background : #C0C0C0;
     height: 100%;
     margin: 0;
 }
@@ -19,6 +19,11 @@ h1 {
 
 .battleground {
     background : #F0F0F0;
+    height: 100%;
+}
+
+.game-archive {
+    overflow-y: auto;
     height: 100%;
 }
 

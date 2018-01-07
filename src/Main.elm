@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (text, div, button, program, Html, node, i, h1)
+import Html exposing (text, div, button, program, Html, node, i, h1, h2)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (attribute, class)
 import RPS exposing (Move(..), GameResult(..), playGame)
@@ -94,19 +94,20 @@ view model =
     , stylesheet "content/style.css"
     , div [class "w3-row board"]
         [ renderPlayerBox "Player" model.score.playerScore
-        , renderBattleGround
+        , renderBattleGround model.finishedGames
         , renderPlayerBox "Bot" model.score.botScore ] 
     , div [class "w3-row w3-content"] 
           [div [class "w3-col button", onClick Restart] [text "Restart"]]
     ]
 
-renderBattleGround : Html Message
-renderBattleGround = div [class "w3-third w3-row battleground"] 
+renderBattleGround : List FinishedGame -> Html Message
+renderBattleGround games = div [class "w3-third w3-row battleground"] 
              [ div [class "w3-col move-choose"] 
                     [ div [class "w3-row"] [gameButton Rock]
                     , div [class "w3-row"] [gameButton Scissors]
                     , div [class "w3-row"] [gameButton Paper]]
-             , div [class "w3-rest"] []]
+             , div [class "w3-rest game-archive"] <| List.map displayFinishedGame games
+             ]
 
 renderPlayerBox : String -> Int -> Html Message
 renderPlayerBox name score =
@@ -116,11 +117,12 @@ renderPlayerBox name score =
 
 displayFinishedGame : FinishedGame -> Html Message
 displayFinishedGame game = 
-    div [class "finished-game"] 
-        [ text "Player: "
+    h2 [class "finished-game"] 
+        [ text "Player "
         , displayMove game.playerMove
-        , text "Bot: "
+        , text " vs "
         , displayMove game.botMove
+        , text " Bot"
         ]
 
 moveToFaGlyph : Move -> String
